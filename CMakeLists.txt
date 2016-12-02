@@ -19,86 +19,88 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 # Generic Compiler Flags
 #
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Weffc++")
     # TODO: A better fix should handle ld's --as-needed flag
-    if(UNIX)
+    if (UNIX)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Xlinker '--no-as-needed'")
-     endif()
-elseif(MSVC)
+    endif ()
+elseif (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX") # exclude M$ min/max macros
     #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /analyze")
-endif()
+endif ()
 
 #
 # Boost
 #
 
-if(MSVC11)
+if (MSVC11)
     # Boost 1.51 fixed a bug with MSVC11
     message(STATUS "Forcing Boost 1.51+ on MSVC11")
     set(BOOST_MIN_VERSION "1.51")
-else()
+else ()
     set(BOOST_MIN_VERSION "1.40")
-endif()
+endif ()
 
 set(CUKE_CORE_BOOST_LIBS thread system regex date_time program_options)
-if(NOT CUKE_DISABLE_BOOST_TEST)
+if (NOT CUKE_DISABLE_BOOST_TEST)
     set(CUKE_TEST_BOOST_LIBS unit_test_framework)
-endif()
+endif ()
 
-if(CUKE_USE_STATIC_BOOST)
+if (CUKE_USE_STATIC_BOOST)
     set(CUKE_STATIC_BOOST_LIBS ${CUKE_CORE_BOOST_LIBS})
     # "An external test runner utility is required to link with dynamic library" (Boost User's Guide)
     set(CUKE_DYNAMIC_BOOST_LIBS ${CUKE_TEST_BOOST_LIBS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_TEST_DYN_LINK")
 
-    if(NOT MSVC)
+    if (NOT MSVC)
         find_package(Threads)
         set(CUKE_EXTRA_LIBRARIES ${CUKE_EXTRA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-    endif()
-else()
+    endif ()
+else ()
     set(CUKE_DYNAMIC_BOOST_LIBS ${CUKE_CORE_BOOST_LIBS} ${CUKE_TEST_BOOST_LIBS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
-endif()
+endif ()
 
 set(Boost_USE_STATIC_RUNTIME OFF)
-if(CUKE_STATIC_BOOST_LIBS)
+if (CUKE_STATIC_BOOST_LIBS)
     set(Boost_USE_STATIC_LIBS ON)
     find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${CUKE_STATIC_BOOST_LIBS})
-endif()
-if(CUKE_DYNAMIC_BOOST_LIBS)
+endif ()
+if (CUKE_DYNAMIC_BOOST_LIBS)
     set(Boost_USE_STATIC_LIBS OFF)
     find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${CUKE_DYNAMIC_BOOST_LIBS})
-endif()
+endif ()
 
-if(Boost_FOUND)
+if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     set(CUKE_EXTRA_LIBRARIES ${CUKE_EXTRA_LIBRARIES} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_REGEX_LIBRARY} ${Boost_DATE_TIME_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-endif()
+endif ()
 
 #
 # GTest
 #
 
-if(NOT CUKE_DISABLE_GTEST)
+if (NOT CUKE_DISABLE_GTEST)
     set(GTEST_USE_STATIC_LIBS ${CUKE_USE_STATIC_GTEST})
-    set(GMOCK_ROOT "${CMAKE_CURRENT_BINARY_DIR}/gmock")
+    if (NOT GMOCK_ROOT)
+        set(GMOCK_ROOT "${CMAKE_CURRENT_BINARY_DIR}/gmock")
+    endif ()
     find_package(GMock REQUIRED)
 
-    if(GTEST_FOUND)
+    if (GTEST_FOUND)
         set(CUKE_GTEST_LIBRARIES
-            GMock::GTest
-        )
-    endif()
-    if(GMOCK_FOUND)
+            GTest::GTest
+            )
+    endif ()
+    if (GMOCK_FOUND)
         set(CUKE_GMOCK_LIBRARIES
-            GMock::GTest
+            GTest::GTest
             GMock::GMock
             GMock::Main
-        )
-    endif()
-endif()
+            )
+    endif ()
+endif ()
 
 #
 # Cucumber-Cpp
@@ -116,18 +118,18 @@ add_subdirectory(src)
 # Tests
 #
 
-if(CUKE_DISABLE_UNIT_TESTS)
+if (CUKE_DISABLE_UNIT_TESTS)
     message(STATUS "Skipping unit tests")
-else()
+else ()
     enable_testing()
     add_subdirectory(tests)
-endif()
+endif ()
 
-if(CUKE_DISABLE_E2E_TESTS)
+if (CUKE_DISABLE_E2E_TESTS)
     message(STATUS "Skipping end-to-end tests")
-else()
+else ()
     find_program(CUCUMBER_RUBY cucumber)
-    if(CUCUMBER_RUBY)
+    if (CUCUMBER_RUBY)
         message(STATUS "Found Cucumber")
         set(CUKE_FEATURES_DIR "${CMAKE_SOURCE_DIR}/features")
         set(CUKE_FEATURES_TMP "${CMAKE_BINARY_DIR}/tmp")
@@ -154,23 +156,23 @@ else()
                 ${ARGV1} ${ARGV2} ${ARGV3} ${ARGV4} ${ARGV5} ${ARGV6}
                 ${CUKE_FEATURES_DIR}
                 DEPENDS cucumber-cpp
-            )
+                )
         endfunction(add_feature_target)
 
         add_feature_target(features --format progress)
         add_feature_target(features-pretty --format pretty)
         add_feature_target(features-wip --format pretty --tags @wip)
 
-    else()
+    else ()
         message(WARNING "Could not find Cucumber: skipping end-to-end tests")
-    endif()
+    endif ()
 
-endif()
+endif ()
 
 #
 # Examples
 #
 
-if(CUKE_ENABLE_EXAMPLES)
+if (CUKE_ENABLE_EXAMPLES)
     add_subdirectory(examples)
-endif()
+endif ()
