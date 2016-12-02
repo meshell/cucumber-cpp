@@ -1,27 +1,30 @@
 # Get the Google C++ Mocking Framework.
 # (This file is almost an copy of the original FindGTest.cmake file,
-#  altered to download and compile GMock and GTest,
+#  altered to download and compile GMock and GTest if not found
+#  in GMOCK_ROOT or GTEST_ROOT respectively,
 #  feel free to use it as it is or modify it for your own needs.)
 #
 # Defines the following variables:
 #
-#   GMOCK_FOUND - Got the Google Mocking framework
+#   GMOCK_FOUND - Found or got the Google Mocking framework
+#   GTEST_FOUND - Found or got the Google Testing framework
 #   GMOCK_INCLUDE_DIRS - GMock include directory
 #   GTEST_INCLUDE_DIRS - GTest include direcotry
 #
 # Also defines the library variables below as normal variables
 #
-#   GMOCK_BOTH_LIBRARIES - Both libgmock & libgmock-main
+#   GMOCK_BOTH_LIBRARIES - Both libgmock & libgmock_main
 #   GMOCK_LIBRARIES - libgmock
 #   GMOCK_MAIN_LIBRARIES - libgmock-main
 #
-#   GTEST_BOTH_LIBRARIES - Both libgtest & libgtest-main
+#   GTEST_BOTH_LIBRARIES - Both libgtest & libgtest_main
 #   GTEST_LIBRARIES - libgtest
-#   GTEST_MAIN_LIBRARIES - libgtest-main
+#   GTEST_MAIN_LIBRARIES - libgtest_main
 #
 # Accepts the following variables as input:
 #
 #   GMOCK_ROOT - The root directory of the gmock install prefix
+#   GTEST_ROOT - The root directory of the gtest install prefix
 #   GMOCK_SRC_DIR -The directory of the gmock sources
 #   GMOCK_VER - The version of the gmock sources to be downloaded
 #
