@@ -104,43 +104,43 @@
 # Thanks to Daniel Blezek <blezek@gmail.com> for the GTEST_ADD_TESTS code
 
 function(gtest_add_tests executable extra_args)
-    if (NOT ARGN)
+    if(NOT ARGN)
         message(FATAL_ERROR "Missing ARGN: Read the documentation for GTEST_ADD_TESTS")
-    endif ()
-    if (ARGN STREQUAL "AUTO")
+    endif()
+    if(ARGN STREQUAL "AUTO")
         # obtain sources used for building that executable
         get_property(ARGN TARGET ${executable} PROPERTY SOURCES)
-    endif ()
+    endif()
     set(gtest_case_name_regex ".*\\( *([A-Za-z_0-9]+) *, *([A-Za-z_0-9]+) *\\).*")
     set(gtest_test_type_regex "(TYPED_TEST|TEST_?[FP]?)")
-    foreach (source ${ARGN})
+    foreach(source ${ARGN})
         file(READ "${source}" contents)
         string(REGEX MATCHALL "${gtest_test_type_regex} *\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
-        foreach (hit ${found_tests})
+        foreach(hit ${found_tests})
             string(REGEX MATCH "${gtest_test_type_regex}" test_type ${hit})
 
             # Parameterized tests have a different signature for the filter
-            if ("x${test_type}" STREQUAL "xTEST_P")
+            if("x${test_type}" STREQUAL "xTEST_P")
                 string(REGEX REPLACE ${gtest_case_name_regex} "*/\\1.\\2/*" test_name ${hit})
-            elseif ("x${test_type}" STREQUAL "xTEST_F" OR "x${test_type}" STREQUAL "xTEST")
+            elseif("x${test_type}" STREQUAL "xTEST_F" OR "x${test_type}" STREQUAL "xTEST")
                 string(REGEX REPLACE ${gtest_case_name_regex} "\\1.\\2" test_name ${hit})
-            elseif ("x${test_type}" STREQUAL "xTYPED_TEST")
+            elseif("x${test_type}" STREQUAL "xTYPED_TEST")
                 string(REGEX REPLACE ${gtest_case_name_regex} "\\1/*.\\2" test_name ${hit})
-            else ()
+            else()
                 message(WARNING "Could not parse GTest ${hit} for adding to CTest.")
                 continue()
-            endif ()
+            endif()
             add_test(NAME ${test_name} COMMAND ${executable} --gtest_filter=${test_name} ${extra_args})
-        endforeach ()
-    endforeach ()
+        endforeach()
+    endforeach()
 endfunction()
 
 function(_append_debugs _endvar _library)
-    if (${_library} AND ${_library}_DEBUG)
+    if(${_library} AND ${_library}_DEBUG)
         set(_output optimized ${${_library}} debug ${${_library}_DEBUG})
-    else ()
+    else()
         set(_output ${${_library}})
-    endif ()
+    endif()
     set(${_endvar} ${_output} PARENT_SCOPE)
 endfunction()
 
@@ -166,29 +166,29 @@ function(_gtest_find_library _name)
     mark_as_advanced(${_name})
 endfunction()
 
-if (NOT DEFINED GMOCK_MSVC_SEARCH)
+if(NOT DEFINED GMOCK_MSVC_SEARCH)
     set(GMOCK_MSVC_SEARCH MD)
-endif ()
+endif()
 
 set(_gmock_libpath_suffixes lib)
 set(_gtest_libpath_suffixes lib)
-if (MSVC)
-    if (GMOCK_MSVC_SEARCH STREQUAL "MD")
+if(MSVC)
+    if(GMOCK_MSVC_SEARCH STREQUAL "MD")
         list(APPEND _gmock_libpath_suffixes
             msvc/gmock-md/Debug
             msvc/gmock-md/Release)
         list(APPEND _gtest_libpath_suffixes
             msvc/gtest-md/Debug
             msvc/gtest-md/Release)
-    elseif (GMOCK_MSVC_SEARCH STREQUAL "MT")
+    elseif(GMOCK_MSVC_SEARCH STREQUAL "MT")
         list(APPEND _gmock_libpath_suffixes
             msvc/gmock/Debug
             msvc/gmock/Release)
         list(APPEND _gtest_libpath_suffixes
             msvc/gtest/Debug
             msvc/gtest/Release)
-    endif ()
-endif ()
+    endif()
+endif()
 
 find_path(GMOCK_INCLUDE_DIR gmock/gmock.h
     HINTS
@@ -204,7 +204,7 @@ find_path(GTEST_INCLUDE_DIR gtest/gtest.h
     )
 mark_as_advanced(GTEST_INCLUDE_DIR)
 
-if (MSVC AND GMOCK_MSVC_SEARCH STREQUAL "MD")
+if(MSVC AND GMOCK_MSVC_SEARCH STREQUAL "MD")
     # The provided /MD project files for Google Mock add -md suffixes to the
     # library names.
     _gmock_find_library(GMOCK_LIBRARY gmock-md gmock)
@@ -216,7 +216,7 @@ if (MSVC AND GMOCK_MSVC_SEARCH STREQUAL "MD")
     _gtest_find_library(GTEST_LIBRARY_DEBUG gtest-mdd gtestd)
     _gtest_find_library(GTEST_MAIN_LIBRARY gtest_main-md gtest_main)
     _gtest_find_library(GTEST_MAIN_LIBRARY_DEBUG gtest_main-mdd gtest_maind)
-else ()
+else()
     _gmock_find_library(GMOCK_LIBRARY gmock)
     _gmock_find_library(GMOCK_LIBRARY_DEBUG gmockd)
     _gmock_find_library(GMOCK_MAIN_LIBRARY gmock_main)
@@ -226,45 +226,45 @@ else ()
     _gtest_find_library(GTEST_LIBRARY_DEBUG gtestd)
     _gtest_find_library(GTEST_MAIN_LIBRARY gtest_main)
     _gtest_find_library(GTEST_MAIN_LIBRARY_DEBUG gtest_maind)
-endif ()
+endif()
 
-if (NOT TARGET GTest::GTest)
+if(NOT TARGET GTest::GTest)
     add_library(GTest::GTest UNKNOWN IMPORTED)
-endif ()
-if (NOT TARGET GTest::Main)
+endif()
+if(NOT TARGET GTest::Main)
     add_library(GTest::Main UNKNOWN IMPORTED)
-endif ()
+endif()
 
-if (NOT TARGET GMock::GMock)
+if(NOT TARGET GMock::GMock)
     add_library(GMock::GMock UNKNOWN IMPORTED)
-endif ()
+endif()
 
-if (NOT TARGET GMock::Main)
+if(NOT TARGET GMock::Main)
     add_library(GMock::Main UNKNOWN IMPORTED)
-endif ()
+endif()
 
-if (NOT ((EXISTS "${GMOCK_LIBRARY}" OR EXISTS "${GMOCK_LIBRARY_DEBUG}") AND GMOCK_INCLUDE_DIR) OR
+if(NOT ((EXISTS "${GMOCK_LIBRARY}" OR EXISTS "${GMOCK_LIBRARY_DEBUG}") AND GMOCK_INCLUDE_DIR) OR
 (NOT ((EXISTS "${GTEST_LIBRARY}" OR EXISTS "${GTEST_LIBRARY_DEBUG}") AND GTEST_INCLUDE_DIR)))
 
     include(ExternalProject)
 
-    if (MSVC)
+    if(MSVC)
         set(Suffix ".lib")
-    else ()
+    else()
         set(Suffix ".a")
-    endif ()
+    endif()
 
-    if (GTEST_USE_STATIC_LIBS)
+    if(GTEST_USE_STATIC_LIBS)
         set(GTEST_CMAKE_ARGS -Dgtest_force_shared_crt:BOOL=ON -DBUILD_SHARED_LIBS=OFF)
         set(GTEST_LIBRARY_PREFIX ${CMAKE_STATIC_LIBRARY_PREFIX})
-    else ()
+    else()
         set(GTEST_CMAKE_ARGS -DBUILD_SHARED_LIBS=ON)
         set(GTEST_LIBRARY_PREFIX ${CMAKE_SHARED_LIBRARY_PREFIX})
-    endif ()
+    endif()
 
-    if ("${GMOCK_SRC_DIR}" STREQUAL "")
+    if("${GMOCK_SRC_DIR}" STREQUAL "")
         message(STATUS "Downloading GMock / GTest version ${GMOCK_VER} from git")
-        if ("${GMOCK_VER}" STREQUAL "1.6.0" OR "${GMOCK_VER}" STREQUAL "1.7.0")
+        if("${GMOCK_VER}" STREQUAL "1.6.0" OR "${GMOCK_VER}" STREQUAL "1.7.0")
             externalproject_add(
                 gtest
                 GIT_REPOSITORY "https://github.com/google/googletest.git"
@@ -309,7 +309,7 @@ if (NOT ((EXISTS "${GMOCK_LIBRARY}" OR EXISTS "${GMOCK_LIBRARY_DEBUG}") AND GMOC
             mark_as_advanced(GMOCK_LIBRARY)
             set(GMOCK_MAIN_LIBRARY "${binary_dir}/${CMAKE_CFG_INTDIR}/${GTEST_LIBRARY_PREFIX}gmock_main${Suffix}")
             mark_as_advanced(GMOCK_MAIN_LIBRARY)
-        else () #1.8.0
+        else() #1.8.0
             externalproject_add(
                 gmock
                 GIT_REPOSITORY "https://github.com/google/googletest.git"
@@ -340,8 +340,8 @@ if (NOT ((EXISTS "${GMOCK_LIBRARY}" OR EXISTS "${GMOCK_LIBRARY_DEBUG}") AND GMOC
             mark_as_advanced(GTEST_LIBRARY)
             mark_as_advanced(GTEST_INCLUDE_DIR)
             mark_as_advanced(GMOCK_MAIN_LIBRARY)
-        endif ()
-    else ()
+        endif()
+    else()
         message(STATUS "Building Gmock / Gtest from dir ${GMOCK_SRC_DIR}")
         externalproject_add(
             gmock
@@ -372,8 +372,8 @@ if (NOT ((EXISTS "${GMOCK_LIBRARY}" OR EXISTS "${GMOCK_LIBRARY_DEBUG}") AND GMOC
         mark_as_advanced(GMOCK_LIBRARY)
         set(GMOCK_MAIN_LIBRARY "${binary_dir}/${CMAKE_CFG_INTDIR}/${GTEST_LIBRARY_PREFIX}gmock_main${Suffix}")
         mark_as_advanced(GMOCK_MAIN_LIBRARY)
-    endif ()
-endif ()
+    endif()
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GTest DEFAULT_MSG GTEST_LIBRARY GTEST_INCLUDE_DIR GTEST_MAIN_LIBRARY)
@@ -388,10 +388,10 @@ set_target_properties(GTest::GTest PROPERTIES
     IMPORTED_LOCATION "${GTEST_LIBRARY}"
     )
 
-if (GTEST_INCLUDE_DIRS)
+if(GTEST_INCLUDE_DIRS)
     set_target_properties(GTest::GTest PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${GTEST_INCLUDE_DIRS}")
-endif ()
+endif()
 
 set_target_properties(GTest::Main PROPERTIES
     INTERFACE_LINK_LIBRARIES "GTest::GTest"
@@ -403,35 +403,35 @@ set_target_properties(GMock::GMock PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
     IMPORTED_LOCATION "${GMOCK_LIBRARY}")
 
-if (GMOCK_INCLUDE_DIRS)
+if(GMOCK_INCLUDE_DIRS)
     set_target_properties(GMock::GMock PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${GMOCK_INCLUDE_DIRS}")
-endif ()
+endif()
 
 set_target_properties(GMock::Main PROPERTIES
     INTERFACE_LINK_LIBRARIES "GMock::GMock"
     IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
     IMPORTED_LOCATION "${GMOCK_MAIN_LIBRARY}")
 
-if (GTEST_FOUND)
+if(GTEST_FOUND)
 
     set(GTEST_INCLUDE_DIRS ${GTEST_INCLUDE_DIR})
     set(GTEST_LIBRARIES ${GTEST_LIBRARY})
     set(GTEST_MAIN_LIBRARIES ${GTEST_MAIN_LIBRARY})
     set(GTEST_BOTH_LIBRARIES ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
-    if (VERBOSE)
+    if(VERBOSE)
         message(STATUS "GTest includes: ${GTEST_INCLUDE_DIRS}")
         message(STATUS "GTest libs: ${GTEST_BOTH_LIBRARIES}")
-    endif ()
-endif ()
+    endif()
+endif()
 
-if (GMOCK_FOUND)
+if(GMOCK_FOUND)
     set(GMOCK_INCLUDE_DIRS ${GMOCK_INCLUDE_DIR})
     set(GMOCK_LIBRARIES ${GMOCK_LIBRARY})
     set(GMOCK_MAIN_LIBRARIES ${GMOCK_MAIN_LIBRARY})
     set(GMOCK_BOTH_LIBRARIES ${GMOCK_LIBRARIES} ${GMOCK_MAIN_LIBRARIES})
-    if (VERBOSE)
+    if(VERBOSE)
         message(STATUS "GMock includes: ${GMOCK_INCLUDE_DIRS}")
         message(STATUS "GMock libs: ${GMOCK_BOTH_LIBRARIES}")
-    endif ()
-endif ()
+    endif()
+endif()

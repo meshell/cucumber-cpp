@@ -13,7 +13,7 @@ set(CUKE_SOURCES
     connectors/wire/WireServer.cpp
     connectors/wire/WireProtocol.cpp
     connectors/wire/WireProtocolCommands.cpp
-)
+    )
 
 if(GTEST_FOUND)
     include_directories(${GTEST_INCLUDE_DIRS})
