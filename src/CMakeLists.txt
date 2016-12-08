@@ -36,11 +36,11 @@ endif()
 add_library(cucumber-cpp-nomain STATIC ${CUKE_SOURCES})
 add_library(cucumber-cpp STATIC ${CUKE_SOURCES} main.cpp)
 
-if(WIN32 AND NOT MSVC)
+if(MINGW)
     target_link_libraries(cucumber-cpp-nomain
         ws2_32
         )
     target_link_libraries(cucumber-cpp
         ws2_32
         )
-endif(WIN32 AND NOT MSVC)
+endif(MINGW)
