@@ -28,9 +28,9 @@ install:
 - git submodule init
 - git submodule update
 - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
-#- gem install bundle
-#- bundle install
-#- bundle env
+- gem install bundle
+- bundle install
+- bundle env
 - if "%build%"=="mingw" set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin\;%PATH%
 - if "%build%"=="mingw" set MSYSTEM=MINGW32
 - if "%build%"=="mingw" set MSYS=winsymlinks=lnk
@@ -40,7 +40,7 @@ install:
 build_script:
 - cmd: if "%build%"=="msvc" call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: cmake -E make_directory build
-- cmd: cmake -E chdir build cmake -G "%CMAKE_GENERATOR%" -DCUKE_ENABLE_EXAMPLES=on -DBOOST_ROOT="%BOOST_ROOT%" -DBOOST_INCLUDEDIR="%BOOST_INCLUDEDIR%" -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" ..
+- cmd: cmake -E chdir build cmake -G "%CMAKE_GENERATOR%" -DCUKE_DISABLE_BOOST_TEST=ON -DCUKE_ENABLE_EXAMPLES=ON -DBOOST_ROOT="%BOOST_ROOT%" -DBOOST_INCLUDEDIR="%BOOST_INCLUDEDIR%" -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" ..
 - cmd: cmake --build build
 
 test_script:
