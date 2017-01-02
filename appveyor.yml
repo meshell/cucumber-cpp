@@ -35,9 +35,6 @@ install:
 - if "%build%"=="mingw" set MSYSTEM=MINGW32
 - if "%build%"=="mingw" set MSYS=winsymlinks=lnk
 - if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
-- cmd: dir %BOOST_ROOT%
-- cmd: dir %BOOST_INCLUDEDIR%
-- cmd: dir %BOOST_LIBRARYDIR%
 
 
 build_script:
