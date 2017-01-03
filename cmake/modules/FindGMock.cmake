@@ -284,7 +284,9 @@ if(NOT (${GMOCK_LIBRARY_EXISTS} AND ${GTEST_LIBRARY_EXISTS}))
                 LOG_DOWNLOAD ON
                 LOG_CONFIGURE ON
                 LOG_BUILD ON
-                CMAKE_ARGS ${GTEST_CMAKE_ARGS}
+                CMAKE_ARGS
+                    -Dgtest_disable_pthreads=${MINGW}
+                    ${GTEST_CMAKE_ARGS}
             )
             externalproject_add(
                 gmock
@@ -295,7 +297,9 @@ if(NOT (${GMOCK_LIBRARY_EXISTS} AND ${GTEST_LIBRARY_EXISTS}))
                 LOG_DOWNLOAD ON
                 LOG_CONFIGURE ON
                 LOG_BUILD ON
-                CMAKE_ARGS ${GTEST_CMAKE_ARGS}
+                CMAKE_ARGS
+                    -Dgtest_disable_pthreads=${MINGW}
+                    ${GTEST_CMAKE_ARGS}
                 DEPENDS gtest
             )
 
@@ -329,7 +333,9 @@ if(NOT (${GMOCK_LIBRARY_EXISTS} AND ${GTEST_LIBRARY_EXISTS}))
                 LOG_DOWNLOAD ON
                 LOG_CONFIGURE ON
                 LOG_BUILD ON
-                CMAKE_ARGS ${GTEST_CMAKE_ARGS}
+                CMAKE_ARGS
+                    -Dgtest_disable_pthreads=${MINGW}
+                    ${GTEST_CMAKE_ARGS}
             )
 
             add_dependencies(GTest::GTest gmock)
@@ -361,7 +367,9 @@ if(NOT (${GMOCK_LIBRARY_EXISTS} AND ${GTEST_LIBRARY_EXISTS}))
             LOG_DOWNLOAD OFF
             LOG_CONFIGURE ON
             LOG_BUILD ON
-            CMAKE_ARGS ${GTEST_CMAKE_ARGS}
+            CMAKE_ARGS
+                -Dgtest_disable_pthreads=${MINGW}
+                ${GTEST_CMAKE_ARGS}
         )
 
         add_dependencies(GTest::GTest gmock)
